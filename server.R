@@ -6,6 +6,9 @@
 #
 
 library(shiny)
+library(rjson)
+library(rCharts)
+library(ggplot2)
 
 shinyServer(function(input, output) {
   
@@ -16,10 +19,51 @@ shinyServer(function(input, output) {
    # If no children, then it's not a valid subreddit
    ifelse(length(subreddit()[[2]]$children) == 0, FALSE, TRUE) 
  }
+ 
+ 
 
  # Get the data and make sure it's valid
  subreddit = reactive(fromJSON(file=subreddit_url()))
  output$valid_subreddit = reactive(valid_subreddit(subreddit))
+
+ # Turn the json object into a dataframe of articles
+  articles = reactive({
+   if(valid_subreddit(subreddit())){
+     # Loop throught the subreddit children(Articles) and pull data
+     children = subreddit()[[2]]$children
+     titles       = c()
+     ups          = c()
+     num_comments = c()
+     
+     for(child in children) {
+       titles       = append(titles, child$data$title)
+       ups          = append(ups, child$data$ups)
+       num_comments = append(num_comments, child$data$num_comments)
+     }
+     
+     # Combine them
+     article_data = data.frame(titles, ups, num_comments)
+   }
+   return(article_data)
+ }) 
+  
  
+  # Figure out the correlation
+  output$correlation = renderTable({
+    correlation  = cor(articles()$ups, articles()$num_comments)
+    num_comments = sum(articles()$num_comments)
+    upvotes      = sum(articles()$ups)
+    fields       = c("Comments", "Upvotes", "Correlation")
+    return(data.frame(fields, c(num_comments, upvotes, correlation)))
+  })
  
+  # Plot comments vs upvotes
+  output$correlation_chart = renderPlot({
+    ggplot(articles(), aes(x=ups, y=num_comments)) +
+      geom_point() +
+      ggtitle("Upvotes vs Comments") +
+      xlab("Upvotes") + 
+      ylab("Comments")
+  })
+  
 })

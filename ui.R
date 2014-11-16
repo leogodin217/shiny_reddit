@@ -6,6 +6,7 @@
 #
 
 library(shiny)
+library(rCharts)
 
 shinyUI(fluidPage(
 
@@ -25,7 +26,9 @@ shinyUI(fluidPage(
     ),
     conditionalPanel(
       condition = "output.valid_subreddit == 1",
-      h2("Valid subreddit")
+      h4("This is a valid subreddit"),
+      tableOutput("correlation"),
+      plotOutput("correlation_chart")
     )
   )
 ))
