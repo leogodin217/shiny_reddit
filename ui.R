@@ -8,13 +8,14 @@
 library(shiny)
 library(rCharts)
 
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme="bootstrap.css",
 
   # Application title
   titlePanel("Shiny Reddit"),
   sidebarPanel(
     textInput("subreddit_name", "Which subreddit do you want to analyze", "patriots"),
-    submitButton("Analyze Subreddit")
+    submitButton("Analyze Subreddit"),
+    p("Type in the name of a subreddit on http://reddit.com. This app will analyze the number of comments and upvotes on the subreddit's front page. Using this data, it will find the correlation between upvotes and comments, then plot data. If you don't know any subreddits, try typing common topics like motorcycles, news, art or cars. Chances are there is a subreddit")
   ),
 
   mainPanel(

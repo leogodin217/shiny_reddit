@@ -54,7 +54,9 @@ shinyServer(function(input, output) {
     num_comments = sum(articles()$num_comments)
     upvotes      = sum(articles()$ups)
     fields       = c("Comments", "Upvotes", "Correlation")
-    return(data.frame(fields, c(num_comments, upvotes, correlation)))
+    df           = data.frame(fields, c(num_comments, upvotes, correlation))
+    names(df)    = c("Field", "Value")
+    return(df)
   })
  
   # Plot comments vs upvotes
