@@ -1,0 +1,90 @@
+---
+title       : 
+subtitle    : 
+author      : 
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Shiny Reddit
+### A subreddit analyzer 
+
+---
+
+## Why?
+Have you ever been reading Reddit and wondered, "Hmm, I wonder if there is a correlation between upvotes and comments on particular subreddits." Of course you have. And that's why we've created the ultra-stupendous, fantastic, mind-bending Shiny Reddit Analyzer. 
+
+--- 
+
+
+## What?
+With the Shiny Reddit Analyzer, you can type in any subreddit and find out the total number of comments, upvotes and the correlation between comments and upvotes. But that's nota all. Act now and we'll throw in a chart mapping upvotes to comments. 
+
+"You can see the data!" - Clark Obvious (A satisfied customer)
+
+---
+
+## How?
+We've combined the awesomeness of Shiny Server with the latest in JavaScript Object Notation to create a powerful application that is faster than a speeding bullet and more powerful than a locomotive. If it had legs, it would jump buildings in single bounds. 
+
+---
+
+## Example
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+library(rjson)
+library(ggplot2)
+library(xtable)
+ subreddit_url = "http://reddit.com/r/motorcycles.json"
+ subreddit = fromJSON(file=subreddit_url)
+
+# Get the articles
+ articles = {
+     # Loop throught the subreddit children(Articles) and pull data
+     children = subreddit[[2]]$children
+     titles       = c()
+     ups          = c()
+     num_comments = c()
+     
+     for(child in children) {
+       titles       = append(titles, child$data$title)
+       ups          = append(ups, child$data$ups)
+       num_comments = append(num_comments, child$data$num_comments)
+     }
+     
+     # Combine them
+     article_data = data.frame(titles, ups, num_comments)
+   
+}
+
+# Get correlation data
+correlation = {
+    correlation  = cor(articles$ups, articles$num_comments)
+    num_comments = sum(articles$num_comments)
+    upvotes      = sum(articles$ups)
+    fields       = c("Comments", "Upvotes", "Correlation")
+    df           = data.frame(fields, c(num_comments, upvotes, correlation))
+    names(df)    = c("Field", "Value")
+    df
+  }
+
+# Print the data
+ print(xtable(correlation, caption="Data"), type = getOption("xtable.type", "html"))
+
+# Plot the data
+ggplot(articles, aes(x=ups, y=num_comments, color=num_comments)) +
+  geom_point() + 
+  geom_smooth() +
+  ggtitle("Upvotes vs Comments") + 
+  xlab("Upvotes") +
+  ylab("Comments")
+  
+
+```
+
+
+
